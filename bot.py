@@ -2,6 +2,7 @@ import time
 from Git.token_number import token_1 as token
 import vk_api
 import vk_api.bot_longpoll
+from colorama import Fore, Back
 
 group_id = 220981746
 
@@ -21,7 +22,7 @@ class Bot:
             try:
                 self.on_event(event=event)
             except Exception as exc:
-                print(f'===***{exc}***===')
+                print(Back.RED, f'===***{exc}***===', Back.RESET)
 
     def on_event(self, event):
         if event.type == vk_api.bot_longpoll.VkBotEventType.MESSAGE_NEW:
@@ -32,7 +33,7 @@ class Bot:
                 random_id=time.time(),
                 peer_id=event.object['message']['peer_id'])
         else:
-            print("We cann't handle this type of event", event.type)
+            print(Fore.BLUE, "We cann't handle this type of event", event.type, Fore.RESET)
 
 
 if __name__ == '__main__':
