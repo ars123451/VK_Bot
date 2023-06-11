@@ -1,7 +1,7 @@
 import time
 from Git.token_number import token_1 as token
 import vk_api
-import vk_api.bot_longpoll
+from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 from colorama import Fore, Back
 
 group_id = 220981746
@@ -13,7 +13,7 @@ class Bot:
         self.group_id = group_id
 
         self.vk = vk_api.VkApi(token=token)
-        self.long_poller = vk_api.bot_longpoll.VkBotLongPoll(self.vk, group_id=self.group_id)
+        self.long_poller = VkBotLongPoll(self.vk, group_id=self.group_id)
         self.api = self.vk.get_api()
 
     def run(self):
@@ -25,7 +25,7 @@ class Bot:
                 print(Back.RED, f'===***{exc}***===', Back.RESET)
 
     def on_event(self, event):
-        if event.type == vk_api.bot_longpoll.VkBotEventType.MESSAGE_NEW:
+        if event.type == VkBotEventType.MESSAGE_NEW:
             print(event.object['message']['text'])
             print(event.object.message)
             self.api.messages.send(
