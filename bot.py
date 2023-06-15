@@ -1,10 +1,26 @@
 import time
-from Git.token_number import token_1 as token
+from token_number import token_1 as token
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
-from colorama import Fore, Back
+import logging
 
 group_id = 220981746
+
+log = logging.getLogger('bot')
+
+
+def configure_logging():
+    stream_handler = logging.StreamHandler()
+    stream_handler.setFormatter(logging.Formatter('%(levelname)s %(message)s '))
+    stream_handler.setLevel(logging.INFO)
+    log.addHandler(stream_handler)
+
+    file_handler = logging.FileHandler(filename='bot_log.txt', mode='w', encoding='UTF8')
+    file_handler.setFormatter(logging.Formatter('%(asctime)s  -  %(levelname)s  -  %(message)s', "%Y-%m-%d %H:%M"))
+    file_handler.setLevel(logging.DEBUG)
+    log.addHandler(file_handler)
+
+    log.setLevel(logging.DEBUG)
 
 
 class Bot:
@@ -17,25 +33,25 @@ class Bot:
         self.api = self.vk.get_api()
 
     def run(self):
+
         for event in self.long_poller.listen():
-            print("Get event!")
             try:
                 self.on_event(event=event)
             except Exception as exc:
-                print(Back.RED, f'===***{exc}***===', Back.RESET)
+                log.exception(f'===***{exc}***===')
 
     def on_event(self, event):
         if event.type == VkBotEventType.MESSAGE_NEW:
-            print(event.object['message']['text'])
-            print(event.object.message)
+            log.info(event.object['message']['text'])
             self.api.messages.send(
                 message=event.object['message']['text'],
                 random_id=time.time(),
                 peer_id=event.object['message']['peer_id'])
         else:
-            print(Fore.BLUE, "We cann't handle this type of event", event.type, Fore.RESET)
+            log.debug(("We cann't handle this type of event", event.type))
 
 
 if __name__ == '__main__':
+    configure_logging()
     bot = Bot(token=token, group_id=220981746)
     bot.run()
