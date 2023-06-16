@@ -33,7 +33,6 @@ class Bot:
         self.api = self.vk.get_api()
 
     def run(self):
-
         for event in self.long_poller.listen():
             try:
                 self.on_event(event=event)
