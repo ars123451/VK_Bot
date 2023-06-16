@@ -1,10 +1,13 @@
 import time
-from token_number import token_1 as token
+# from token_number import token_1 as token
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import logging
 
-group_id = 220981746
+try:
+    import settings
+except ImportError:
+    exit('Do copy settings.py.default and set token!!!')
 
 log = logging.getLogger('bot')
 
@@ -15,7 +18,7 @@ def configure_logging():
     stream_handler.setLevel(logging.INFO)
     log.addHandler(stream_handler)
 
-    file_handler = logging.FileHandler(filename='bot_log.txt', mode='w', encoding='UTF8')
+    file_handler = logging.FileHandler(filename='bot.log', mode='w', encoding='UTF8')
     file_handler.setFormatter(logging.Formatter('%(asctime)s  -  %(levelname)s  -  %(message)s', "%Y-%m-%d %H:%M"))
     file_handler.setLevel(logging.DEBUG)
     log.addHandler(file_handler)
@@ -24,7 +27,17 @@ def configure_logging():
 
 
 class Bot:
+    """
+    Echo bot for Vk.com.
+    Use Python 3.11.3
+    """
+
     def __init__(self, token, group_id):
+        """
+
+        :param token: secret token from vk group
+        :param group_id: group id from vk group
+        """
         self.token = token
         self.group_id = group_id
 
@@ -33,6 +46,7 @@ class Bot:
         self.api = self.vk.get_api()
 
     def run(self):
+        """ Run bot """
         for event in self.long_poller.listen():
             try:
                 self.on_event(event=event)
@@ -40,6 +54,12 @@ class Bot:
                 log.exception(f'===***{exc}***===')
 
     def on_event(self, event):
+        """
+        Return your message if it is text
+
+        :param event: VkBotMessageEvent object
+        :return: None
+        """
         if event.type == VkBotEventType.MESSAGE_NEW:
             log.info(event.object['message']['text'])
             self.api.messages.send(
@@ -52,5 +72,5 @@ class Bot:
 
 if __name__ == '__main__':
     configure_logging()
-    bot = Bot(token=token, group_id=220981746)
+    bot = Bot(token=settings.TOKEN, group_id=settings.GROUP_ID)
     bot.run()
