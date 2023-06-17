@@ -64,7 +64,8 @@ class Bot:
             self.api.messages.send(
                 message=event.object['message']['text'],
                 random_id=time.time(),
-                peer_id=event.object['message']['peer_id'])
+                peer_id=event.object['message']['peer_id']
+            )
         else:
             log.debug(("We cann't handle this type of event", event.type))
 
