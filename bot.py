@@ -54,7 +54,7 @@ class Bot:
 
     def on_event(self, event):
         """
-        Return your message if it is text
+        Return your message if it is a text
 
         :param event: VkBotMessageEvent object
         :return: None
