@@ -1,5 +1,4 @@
 import time
-# from token_number import token_1 as token
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 import logging
