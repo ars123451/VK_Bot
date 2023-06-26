@@ -67,7 +67,7 @@ class Test1(TestCase):
                 bot.api.message.send = send_mock
 
                 bot.on_event(event)
-
+                #
                 # send_mock.assert_called_once_with(
                 #     message=self.RAW_EVENT['object']['message']['text'],
                 #     random_id=ANY,

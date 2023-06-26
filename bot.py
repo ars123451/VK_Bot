@@ -29,6 +29,13 @@ class Bot:
     """
     Echo bot for Vk.com.
     Use Python 3.11.3
+
+
+    -ask name
+    -ask email
+    -says if the registration is correct
+
+    repeat if this step not ready
     """
 
     def __init__(self, token, group_id):
@@ -43,6 +50,7 @@ class Bot:
         self.vk = vk_api.VkApi(token=token)
         self.long_poller = VkBotLongPoll(self.vk, group_id=self.group_id)
         self.api = self.vk.get_api()
+        self.user_states = dict()  # user_id -> UserState
 
     def run(self):
         """ Run bot """
