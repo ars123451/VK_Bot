@@ -51,3 +51,11 @@ SCENARIOS = {
 }
 
 DEFAULT_ANSWER = "Не знаю как на это ответить, спросите что-то другое ! "
+
+DB_CONFIG = dict(
+    provider='postgres',
+    user='postgres',
+    password='1234',
+    host='localhost',
+    database='vk_chat_bot'
+)

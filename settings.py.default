@@ -1,0 +1,60 @@
+TOKEN = ' '
+
+GROUP_ID = 220981746
+
+INTENTS = [
+    {
+        "name": "Дата проведения",
+        "tokens": ("когда", "сколько", "дату", "дата"),
+        "scenario": None,
+        "answer": "Конференция проводится 19 февраля. Регистрация начинается в 10:00"
+    },
+    {
+        "name": "Место проведения ",
+        "tokens": ("где", "место", "адрес", "метро"),
+        "scenario": None,
+        "answer": "Конференция пройдёт в городе Москва"
+    },
+    {
+        "name": "Регистрация",
+        "tokens": ("регистр", "добав"),
+        "scenario": "registration",
+        "answer": None
+    }
+]
+SCENARIOS = {
+    'registration': {
+        "first_step": "step_1",
+        "steps": {
+            "step_1": {
+                "text": "Чтобы зарегистрироваться, введите своё имя:",
+                "failure_text": "Имя должно состоять из 3-30 букв и дефиса. Введите имя ещё раз!",
+                "handler": "handle_name",
+                "next_step": "step_2"
+            },
+            "step_2": {
+                "text": "Введите email. На него придёт вся информация",
+                "failure_text": "Некорректный email. Введите email ещё раз!",
+                "handler": "handle_email",
+                "next_step": "step_3"
+            },
+            "step_3": {
+                "text": "Спасибо за регистрацию, {name}! Мы пришлём билет на {email}. Распечатайте его",
+                "failure_text": None,
+                "handler": None,
+                "next_step": None
+            }
+        }
+    }
+}
+
+DEFAULT_ANSWER = "Не знаю как на это ответить, спросите что-то другое ! "
+
+
+DB_CONFIG = {
+    provider='postgres',
+    user='postgres',
+    password='1234',
+    host='localhost',
+    database='vk_chat_bot'
+}
