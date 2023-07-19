@@ -4,6 +4,7 @@ colorama==0.4.6
 coverage==7.2.7
 enum34==1.1.10
 idna==3.4
+Pillow==10.0.0
 pony==0.7.16
 psycopg2==2.9.6
 requests==2.31.0
