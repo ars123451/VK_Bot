@@ -1,4 +1,6 @@
 import time
+
+import requests
 import vk_api
 from pony.orm import db_session
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
@@ -107,13 +109,23 @@ class Bot:
         )
 
     def send_image(self, image, user_id):
-        pass
+        upload_url = self.api.photos.getMessagesUploadServer()['upload_url']
+        upload_data = requests.post(upload_url, files={'photo': ('image.png', image, 'image/png')}).json()
+        image_data = self.api.photos.saveMessagesPhoto(**upload_data)
+        owner_id = image_data[0]['owner_id']
+        media_id = image_data[0]['id']
+        attachment = f'photo{owner_id}_{media_id}'
+        self.api.messages.send(
+            attachment=attachment,
+            random_id=time.time(),
+            peer_id=user_id
+        )
 
     def send_step(self, step, user_id, text, context):
         if 'text' in step:
-            self.send_text(step['text'], user_id).format(**context)
+            self.send_text(step['text'].format(**context), user_id)
         if 'image' in step:
-            handle = getattr(handlers, step['image  '])
+            handle = getattr(handlers, step['image'])
             image = handle(text, context)
             self.send_image(image, user_id)
 
@@ -133,9 +145,9 @@ class Bot:
             # next step
             next_step = steps[step['next_step']]
             self.send_step(next_step, user_id, text, state.context)
-            
+
             if next_step['next_step']:
-                # switch to next step
+                # switch to next sgtep
                 state.step_name = step['next_step']
             else:
                 log.info('{name} {email}'.format(**state.context))
