@@ -85,43 +85,55 @@ class Bot:
         text = event.object.message['text'].lower()
         state = UserState.get(user_id=str(user_id))
         if state is not None:
-            text_to_send = self.continue_scenario(text=text, state=state)
+            self.continue_scenario(text=text, state=state, user_id=user_id)
         else:
             # search intent
             for intent in settings.INTENTS:
                 # log.debug(f'We get {intent}')
                 if any(token in text for token in intent['tokens']):
                     if intent['answer']:
-                        text_to_send = intent['answer']
+                        self.send_text(intent['answer'], user_id)
                     else:
-                        text_to_send = self.start_scenario(user_id=user_id, scenario_name=intent['scenario'])
+                        self.start_scenario(user_id=user_id, scenario_name=intent['scenario'], text=text)
                     break
             else:
-                text_to_send = settings.DEFAULT_ANSWER
+                self.send_text(settings.DEFAULT_ANSWER, user_id)
 
+    def send_text(self, text_to_send, user_id):
         self.api.messages.send(
             message=text_to_send,
             random_id=time.time(),
             peer_id=user_id
         )
 
-    def start_scenario(self, user_id, scenario_name):
+    def send_image(self, image, user_id):
+        pass
+
+    def send_step(self, step, user_id, text, context):
+        if 'text' in step:
+            self.send_text(step['text'], user_id).format(**context)
+        if 'image' in step:
+            handle = getattr(handlers, step['image  '])
+            image = handle(text, context)
+            self.send_image(image, user_id)
+
+    def start_scenario(self, user_id, scenario_name, text):
         scenario = settings.SCENARIOS[scenario_name]
         first_step = scenario['first_step']
         step = scenario['steps'][first_step]
-        text_to_send = step['text']
+        self.send_step(step, user_id, text, context={})
         UserState(user_id=str(user_id), scenario_name=scenario_name, step_name=first_step, context={})
-        return text_to_send
 
-    def continue_scenario(self, text, state):
+    def continue_scenario(self, text, state, user_id):
         steps = settings.SCENARIOS[state.scenario_name]['steps']
         step = steps[state.step_name]
 
         handler = getattr(handlers, step['handler'])
         if handler(text=text, context=state.context):
-            # next stepl
+            # next step
             next_step = steps[step['next_step']]
-            text_to_send = next_step['text'].format(**state.context)
+            self.send_step(next_step, user_id, text, state.context)
+            
             if next_step['next_step']:
                 # switch to next step
                 state.step_name = step['next_step']
@@ -131,8 +143,7 @@ class Bot:
                 state.delete()
         else:
             # retry this step
-            text_to_send = step['failure_text']
-        return text_to_send
+            self.send_text(step['failure_text'], user_id)
 
 
 if __name__ == '__main__':

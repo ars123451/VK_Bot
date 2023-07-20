@@ -1,5 +1,7 @@
 import re
 
+from generate_ticket import generate_ticket
+
 re_name = r"^[\w\-\s]{3,30}$"
 re_email = r'\b[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
@@ -20,3 +22,7 @@ def handle_email(text, context):
         return True
     else:
         return False
+
+
+def handle_generate_ticket(text, context):
+    return generate_ticket(context['name'], context['email'])
